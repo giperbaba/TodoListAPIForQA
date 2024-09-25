@@ -4,7 +4,7 @@ import com.giperbaba.demo.entity.Task
 
 class TaskDto (
     var description: String,
-    var isDone: Boolean
+    var isDone: Boolean,
 )
 
 fun TaskDto.toEntity(): Task {

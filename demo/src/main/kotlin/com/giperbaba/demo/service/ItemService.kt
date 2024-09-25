@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import jakarta.transaction.Transactional
 
 //реализация бизнес-логики
 
@@ -22,18 +23,25 @@ class ItemService(private val repository: ItemRepository) {
         repository.deleteById(id)
     }
 
-    fun <T> updateCondition(id: Long, newCondition: T) {
+    fun updateTaskDescription(id: Long, newDescription: String) {
         val taskOption = repository.findById(id)
         if (taskOption.isPresent) {
             val task = taskOption.get()
-            if (newCondition is Boolean) {
-                task.isDone = newCondition
-            } else if (newCondition is String) {
-                task.description = newCondition
-            }
+            task.description = newDescription
             repository.save(task)
         } else {
-            throw Exception("task with this id $id not found")
+            throw Exception("task with this id $id is not found")
+        }
+    }
+
+    fun updateTaskIsDone(id: Long, isDone: Boolean) {
+        val taskOption = repository.findById(id)
+        if (taskOption.isPresent) {
+            val task = taskOption.get()
+            task.isDone = isDone
+            repository.save(task)
+        } else {
+            throw Exception("task with this id $id is not found")
         }
     }
 
@@ -41,6 +49,7 @@ class ItemService(private val repository: ItemRepository) {
         return repository.findAll().map { it.toDto() }
     }
 
+    @Transactional
     fun uploadArray(tasks: List<TaskDto>) {
         if (tasks.isEmpty()) {
             throw Exception("array is empty")
