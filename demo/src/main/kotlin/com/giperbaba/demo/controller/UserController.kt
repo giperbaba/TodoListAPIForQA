@@ -67,7 +67,12 @@ class UserController(private val service: ItemService) {
 
     @PostMapping("upload/json")
     fun uploadJson(@RequestParam("file") file: MultipartFile): ResponseEntity<String> {
-        service.uploadJson(file)
-        return ResponseEntity.ok().build()
+        try {
+            service.uploadJson(file)
+            return ResponseEntity.ok().build()
+        } catch (e: Exception) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+
     }
 }
