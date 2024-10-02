@@ -4,6 +4,7 @@ import com.giperbaba.demo.service.ItemService
 import com.giperbaba.demo.dto.TaskDto
 import com.giperbaba.demo.dto.UpdateTaskDescriptionDto
 import com.giperbaba.demo.dto.UpdateTaskIsDoneDto
+import com.giperbaba.demo.entity.Task
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -13,12 +14,14 @@ import java.io.File
 
 @RestController
 @RequestMapping("api/todo_list")
+@CrossOrigin(origins = ["*"])
 class UserController(private val service: ItemService) {
 
     @PostMapping("create")
-    fun createTask(@RequestBody taskDto: TaskDto): ResponseEntity<String> {
-        service.save(taskDto)
-        return ResponseEntity.ok().build()
+    fun createTask(@RequestBody taskDto: TaskDto): ResponseEntity<Map<String, Long?>> {
+        val idSavedTask = service.save(taskDto)
+        println("Сохранённый ID задачи: $idSavedTask")
+        return ResponseEntity.ok(mapOf("id" to idSavedTask))
     }
 
     @DeleteMapping("delete/{id}")
@@ -50,7 +53,7 @@ class UserController(private val service: ItemService) {
     }
 
     @GetMapping
-    fun getTasks(): ResponseEntity<List<TaskDto>> {
+    fun getTasks(): ResponseEntity<List<Task>> {
         val tasks = service.getTasks()
         return ResponseEntity.ok(tasks)
     }

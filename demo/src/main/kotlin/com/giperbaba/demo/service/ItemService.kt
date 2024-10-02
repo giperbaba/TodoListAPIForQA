@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
+import com.giperbaba.demo.entity.Task
 import jakarta.transaction.Transactional
 
 //реализация бизнес-логики
@@ -15,8 +16,10 @@ import jakarta.transaction.Transactional
 @Service
 class ItemService(private val repository: ItemRepository) {
 
-    fun save(taskDto: TaskDto) {
-        repository.save(taskDto.toEntity())
+    fun save(taskDto: TaskDto): Long? {
+        val entityTask = taskDto.toEntity()
+        repository.save(entityTask)
+        return entityTask.id;
     }
 
     fun deleteTask(id: Long) {
@@ -45,8 +48,8 @@ class ItemService(private val repository: ItemRepository) {
         }
     }
 
-    fun getTasks(): List<TaskDto> {
-        return repository.findAll().map { it.toDto() }
+    fun getTasks(): List<Task> {
+        return repository.findAll()
     }
 
     @Transactional
