@@ -18,10 +18,9 @@ import java.io.File
 class UserController(private val service: ItemService) {
 
     @PostMapping("create")
-    fun createTask(@RequestBody taskDto: TaskDto): ResponseEntity<Map<String, Long?>> {
-        val idSavedTask = service.save(taskDto)
-        println("Сохранённый ID задачи: $idSavedTask")
-        return ResponseEntity.ok(mapOf("id" to idSavedTask))
+    fun createTask(@RequestBody taskDto: TaskDto): ResponseEntity<Task> {
+        val task = service.save(taskDto)
+        return ResponseEntity.ok(task);
     }
 
     @DeleteMapping("delete/{id}")

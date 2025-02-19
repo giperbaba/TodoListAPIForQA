@@ -16,10 +16,10 @@ import jakarta.transaction.Transactional
 @Service
 class ItemService(private val repository: ItemRepository) {
 
-    fun save(taskDto: TaskDto): Long? {
+    fun save(taskDto: TaskDto): Task {
         val entityTask = taskDto.toEntity()
         repository.save(entityTask)
-        return entityTask.id;
+        return entityTask;
     }
 
     fun deleteTask(id: Long) {
