@@ -1,25 +1,18 @@
 package com.giperbaba.demo.controller
 
-import com.giperbaba.demo.service.ItemService
-import com.giperbaba.demo.dto.TaskDto
-import com.giperbaba.demo.dto.UpdateTaskDescriptionDto
-import com.giperbaba.demo.dto.UpdateTaskIsDoneDto
-import com.giperbaba.demo.entity.Task
+import com.giperbaba.demo.dto.*
+import com.giperbaba.demo.service.ITaskService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import org.springframework.web.multipart.MultipartFile
-import java.io.File
-
-//обработка HTTP-запросов
 
 @RestController
 @RequestMapping("api/todo_list")
 @CrossOrigin(origins = ["*"])
-class UserController(private val service: ItemService) {
+class UserController(private val service: ITaskService) {
 
     @PostMapping("create")
-    fun createTask(@RequestBody taskDto: TaskDto): ResponseEntity<Task> {
-        val task = service.save(taskDto)
+    fun createTask(@RequestBody taskDto: TaskCreateDto): ResponseEntity<TaskDetailsDto> {
+        val task = service.create(taskDto)
         return ResponseEntity.ok(task);
     }
 
@@ -29,52 +22,57 @@ class UserController(private val service: ItemService) {
         return ResponseEntity.ok().build()
     }
 
-    @PutMapping("update/desc/{id}")
-    fun updateTaskDescription(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskDescriptionDto):
+    @PutMapping("update/name/{id}")
+    fun updateTaskName(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskNameRequest):
             ResponseEntity<String> {
         try {
-            service.updateTaskDescription(id, updateTaskDto.newDescription)
+            service.updateTaskName(id, updateTaskDto)
             return ResponseEntity.ok().build()
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @PutMapping("update/desc/{id}")
+    fun updateTaskDescription(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskDescriptionRequest):
+            ResponseEntity<String> {
+        try {
+            service.updateTaskDescription(id, updateTaskDto)
+            return ResponseEntity.ok().build()
+        }
+        catch (e: Exception) {
             return ResponseEntity.badRequest().body(e.message)
         }
     }
 
     @PutMapping("update/is_done/{id}")
-    fun updateTaskIsDone(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskIsDoneDto):
+    fun updateTaskIsDone(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskIsDoneRequest):
             ResponseEntity<String> {
         try {
-            service.updateTaskIsDone(id, updateTaskDto.isDone)
+            service.updateTaskIsDone(id, updateTaskDto)
             return ResponseEntity.ok().build()
-        } catch (e: Exception) {
+        }
+        catch (e: Exception) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
+    @PutMapping("update/priority/{id}")
+    fun updateTaskPriority(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskPriorityRequest):
+            ResponseEntity<String> {
+        try {
+            service.updateTaskPriority(id, updateTaskDto)
+            return ResponseEntity.ok().build()
+        }
+        catch (e: Exception) {
             return ResponseEntity.badRequest().body(e.message)
         }
     }
 
     @GetMapping
-    fun getTasks(): ResponseEntity<List<Task>> {
-        val tasks = service.getTasks()
+    fun getTasks( @ModelAttribute filter: TaskFilterRequest ): ResponseEntity<List<TaskDetailsDto>> {
+        val tasks = service.getTasks(filter)
         return ResponseEntity.ok(tasks)
-    }
-
-    @PostMapping("upload/array")
-    fun uploadArray(@RequestBody tasks: List<TaskDto>): ResponseEntity<String> {
-        try {
-            service.uploadArray(tasks)
-            return ResponseEntity.ok().build()
-        } catch (e: Exception) {
-            return ResponseEntity.badRequest().body(e.message)
-        }
-    }
-
-    @PostMapping("upload/json")
-    fun uploadJson(@RequestParam("file") file: MultipartFile): ResponseEntity<String> {
-        try {
-            service.uploadJson(file)
-            return ResponseEntity.ok().build()
-        } catch (e: Exception) {
-            return ResponseEntity.badRequest().body(e.message)
-        }
-
     }
 }

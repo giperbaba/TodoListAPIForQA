@@ -1,14 +1,14 @@
 package com.giperbaba.demo.repository
 
 import com.giperbaba.demo.entity.Task
-import jakarta.transaction.Transactional
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 import java.util.*
 
 //взаимодействие с базой данных
 
 @Repository
-interface ItemRepository : JpaRepository<Task, Long> {
+interface TaskRepository : JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     override fun findById(id: Long): Optional<Task>
 }

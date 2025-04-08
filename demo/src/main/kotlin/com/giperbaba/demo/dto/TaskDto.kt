@@ -1,16 +1,22 @@
 package com.giperbaba.demo.dto
 
 import com.giperbaba.demo.entity.Task
+import com.giperbaba.demo.enums.Priority
+import java.time.LocalDate
 
-class TaskDto (
-    var description: String,
-    var isDone: Boolean,
+class TaskCreateDto (
+    var name: String,
+    var description: String? = "",
+    var isDone: Boolean = false,
+    var priority: Priority? = Priority.Medium,
+    var deadline: LocalDate? = null,
 )
 
-fun TaskDto.toEntity(): Task {
-    return Task(description = description, isDone = isDone)
+fun TaskCreateDto.toEntity(): Task {
+    return Task(name = name,
+        description = description,
+        isDone = isDone,
+        priority = priority,
+        deadline = deadline)
 }
 
-fun Task.toDto(): TaskDto {
-    return TaskDto(description, isDone)
-}
