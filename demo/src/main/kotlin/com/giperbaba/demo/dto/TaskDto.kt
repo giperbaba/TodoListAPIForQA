@@ -7,15 +7,14 @@ import java.time.LocalDate
 class TaskCreateDto (
     var name: String,
     var description: String? = "",
-    var isDone: Boolean = false,
-    var priority: Priority? = Priority.Medium,
+    var priority: Priority?,
     var deadline: LocalDate? = null,
 )
 
 fun TaskCreateDto.toEntity(): Task {
     return Task(name = name,
         description = description,
-        isDone = isDone,
+        isDone = false,
         priority = priority,
         deadline = deadline)
 }

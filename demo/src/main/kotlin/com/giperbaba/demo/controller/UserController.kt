@@ -70,9 +70,27 @@ class UserController(private val service: ITaskService) {
         }
     }
 
+    @PutMapping("update/deadline/{id}")
+    fun updateTaskDeadline(@PathVariable id: Long, @RequestBody updateTaskDto: UpdateTaskDeadlineRequest):
+            ResponseEntity<String> {
+        try {
+            service.updateTaskDeadline(id, updateTaskDto)
+            return ResponseEntity.ok().build()
+        }
+        catch (e: Exception) {
+            return ResponseEntity.badRequest().body(e.message)
+        }
+    }
+
     @GetMapping
     fun getTasks( @ModelAttribute filter: TaskFilterRequest ): ResponseEntity<List<TaskDetailsDto>> {
         val tasks = service.getTasks(filter)
         return ResponseEntity.ok(tasks)
+    }
+
+    @GetMapping("task/{id}")
+    fun getTask( @PathVariable id: Long): ResponseEntity<TaskDetailsDto> {
+        val task = service.getTask(id)
+        return ResponseEntity.ok(task)
     }
 }

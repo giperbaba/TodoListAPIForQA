@@ -45,19 +45,3 @@ fun TaskDetailsDto.toEntity(): Task {
         deadline = this.deadline
     )
 }
-
-fun List<TaskDetailsDto>.sortByPriority(): List<TaskDetailsDto> {
-    return this.sortedBy { it.priority?.ordinal ?: Priority.Medium.ordinal }
-}
-
-fun List<TaskDetailsDto>.sortByStatus(): List<TaskDetailsDto> {
-    return this.sortedBy { it.status?.ordinal ?: Status.Active.ordinal }
-}
-
-fun List<TaskDetailsDto>.sortByDateCreated(ascending: Boolean = true): List<TaskDetailsDto> {
-    return if (ascending) {
-        this.sortedBy { it.dateCreated }
-    } else {
-        this.sortedByDescending { it.dateCreated }
-    }
-}

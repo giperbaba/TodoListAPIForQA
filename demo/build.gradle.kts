@@ -1,9 +1,28 @@
 plugins {
 	id("org.springframework.boot") version "3.3.4"
 	id("io.spring.dependency-management") version "1.1.6"
+	id("jacoco")
 	kotlin("jvm") version "1.9.25"
 	kotlin("plugin.spring") version "1.9.25"
 	kotlin("plugin.jpa") version "1.9.25"
+
+}
+
+jacoco {
+	toolVersion = "0.8.10"
+}
+
+tasks.test {
+	useJUnitPlatform()
+	finalizedBy(tasks.jacocoTestReport)
+}
+
+tasks.jacocoTestReport {
+	dependsOn(tasks.test)
+	reports {
+		xml.required.set(true)
+		html.required.set(true)
+	}
 }
 
 group = "com.giperbaba"
@@ -34,6 +53,10 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+	testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+	testImplementation("org.mockito:mockito-core:5.11.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 }
 
 kotlin {
