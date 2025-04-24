@@ -39,6 +39,10 @@ object TaskMapper {
             cleanName = cleanName.replace(match.value, "").trim()
         }
 
+        if (cleanName.contains("!before")) {
+            throw IllegalArgumentException("Неподдерживаемый формат даты: макрос указан, но не распознан")
+        }
+
         priorityRegex.find(cleanName)?.let { match ->
             params.priority = parsePriority(match.groupValues[1])
             cleanName = cleanName.replace(match.value, "").trim()
@@ -54,24 +58,35 @@ object TaskMapper {
     private fun parseDate(dateStr: String): LocalDate {
         for (formatter in supportedDateFormats) {
             try {
-                return LocalDate.parse(dateStr, formatter)
-            } catch (e: DateTimeParseException) {
-                continue;
+                val parsedDate = LocalDate.parse(dateStr, formatter)
+                val formattedBack = parsedDate.format(formatter)
+
+                // если после парсинга и обратно форматирования дата отличается — значит была невалидная
+                if (!formattedBack.equals(dateStr, ignoreCase = true)) {
+                    continue
+                }
+
+                return parsedDate
+            }
+            catch (e: DateTimeParseException) {
+                continue
             }
         }
         throw IllegalArgumentException("Неподдерживаемый формат даты: $dateStr")
     }
 
     private fun parsePriority(priorityStr: String): Priority {
-        return when (priorityStr) {
-            "1" -> Priority.Critical
-            "2" -> Priority.High
-            "3" -> Priority.Medium
-            "4" -> Priority.Low
-            else -> throw ResponseStatusException(
-                HttpStatus.BAD_REQUEST,
-                "Приоритет должен быть от !1 (Critical) до !4 (Low)"
-            )
+        if (priorityStr == "1") {
+            return Priority.Critical
+        }
+        else if (priorityStr == "2") {
+            return Priority.High
+        }
+        else if (priorityStr == "4") {
+            return Priority.Low
+        }
+        else {
+            return Priority.Medium
         }
     }
 
