@@ -13,17 +13,7 @@ import kotlin.test.assertFailsWith
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class TaskMapperTest {
 
-    @BeforeEach
-    fun setup() {
-        println("Running test...")
-    }
-
-    @AfterEach
-    fun teardown() {
-        println("Test finished.")
-    }
-
-    // Валидные даты
+    //валидные даты
     @ParameterizedTest
     @CsvSource(
         "!before 01.05.2025,2025-05-01",
@@ -38,7 +28,7 @@ class TaskMapperTest {
         assertEquals(LocalDate.parse(expectedDate), params.deadline)
     }
 
-    // Невалидные даты
+    //невалидные даты
     @ParameterizedTest
     @CsvSource("!before 2025/01/01", "!before 01.13.2025", "!before 31.02.2025", "!before 31.04.2025", "!before 31.02.2025")
     fun `should throw error on invalid date formats`(input: String) {
@@ -48,7 +38,7 @@ class TaskMapperTest {
         assert(exception.message!!.contains("Неподдерживаемый формат даты"))
     }
 
-    // Приоритет макросов
+    //приоритет макросов
     @ParameterizedTest
     @CsvSource(
         "!1,Critical",
@@ -62,15 +52,23 @@ class TaskMapperTest {
         assertEquals(expected, params.priority)
     }
 
-    // Корректное количество символов
+    //корректное количество символов 4
     @Test
     fun `should pass for exactly 4 characters name`() {
-        val name = "Abcd !1"
+        val name = "Abcd!1"
         val (clean, _) = TaskMapper.extractParameters(name)
         assertEquals("Abcd", clean)
     }
 
-    // Некорректное количество символов
+    //корректное количество символов > 4
+    @Test
+    fun `should pass for more than 4 characters name`() {
+        val name = "Abcdfdfd !1"
+        val (clean, _) = TaskMapper.extractParameters(name)
+        assertEquals("Abcdfdfd", clean)
+    }
+
+    //некорректное количество символов < 4
     @Test
     fun `should fail for name with less than 4 characters`() {
         val exception = assertFailsWith<ResponseStatusException> {
@@ -79,7 +77,7 @@ class TaskMapperTest {
         assertEquals("400 BAD_REQUEST \"Название задачи должно содержать минимум 4 символа помимо макросов\"", exception.message)
     }
 
-    // Несколько макросов
+    //несколько макросов (должен взять первые и очистить все)
     @ParameterizedTest
     @CsvSource(
         "Task !1 !before 01.01.2025, Critical, 2025-01-01",
@@ -96,7 +94,7 @@ class TaskMapperTest {
         }
     }
 
-    // Приоритет макросов
+    //приоритет макросов приоритета
     @ParameterizedTest
     @CsvSource(
         "!1,High",
@@ -115,7 +113,7 @@ class TaskMapperTest {
         assertEquals(fieldPriority, entity.priority)
     }
 
-    // Приоритет макросов дедлайна
+    //приоритет макросов дедлайна
     @ParameterizedTest
     @CsvSource(
         "2025-06-01,01.07.2025",
@@ -132,7 +130,7 @@ class TaskMapperTest {
         assertEquals(LocalDate.parse(fieldDate), entity.deadline)
     }
 
-    // Приорирет с поля
+    //приорирет с поля
     @Test
     fun `should parse priority only from field`() {
         val dto = TaskCreateDto("Task", "desc", Priority.High, null)
@@ -140,7 +138,7 @@ class TaskMapperTest {
         assertEquals(Priority.High, entity.priority)
     }
 
-    // Дедлайн с поля
+    //дедлайн с поля
     @Test
     fun `should parse deadline only from field`() {
         val date = LocalDate.of(2025, 5, 1)
@@ -149,7 +147,7 @@ class TaskMapperTest {
         assertEquals(date, entity.deadline)
     }
 
-    // Пустое название
+    //пустое название
     @Test
     fun `should fail for empty name`() {
         val exception = assertFailsWith<ResponseStatusException> {
@@ -158,7 +156,7 @@ class TaskMapperTest {
         assertEquals("400 BAD_REQUEST \"Название задачи должно содержать минимум 4 символа помимо макросов\"", exception.message)
     }
 
-    // Пустое название (из пробелов)
+    //пустое название (из пробелов)
     @Test
     fun `should fail for name with only spaces and macros`() {
         val exception = assertFailsWith<ResponseStatusException> {
@@ -167,7 +165,7 @@ class TaskMapperTest {
         assertEquals("400 BAD_REQUEST \"Название задачи должно содержать минимум 4 символа помимо макросов\"", exception.message)
     }
 
-    // Игнорирует неизвестный макрос
+    //игнорирует неизвестный макрос
     @Test
     fun `should ignore unknown macros in name`() {
         val (clean, params) = TaskMapper.extractParameters("Task !9")
@@ -175,7 +173,7 @@ class TaskMapperTest {
         assertEquals(null, params.priority)
     }
 
-    // Очищает пробелы и парсит макросы
+    //очищает пробелы и парсит макросы
     @Test
     fun `should clean name and parse correctly with mixed spacing`() {
         val (clean, params) = TaskMapper.extractParameters("Task !1    !before   01.01.2025")
@@ -184,7 +182,7 @@ class TaskMapperTest {
         assertEquals(LocalDate.parse("2025-01-01"), params.deadline)
     }
 
-    // Без макросов
+    //без макросов
     @Test
     fun `should handle no macros gracefully`() {
         val (clean, params) = TaskMapper.extractParameters("Regular task name")
@@ -193,7 +191,7 @@ class TaskMapperTest {
         assertEquals(null, params.deadline)
     }
 
-    // Все параметры
+    //все параметры
     @Test
     fun `should create task entity from full dto`() {
         val dto = TaskCreateDto("Test !2 !before 01.01.2025", "desc", null, null)

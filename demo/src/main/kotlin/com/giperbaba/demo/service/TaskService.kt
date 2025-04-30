@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import com.giperbaba.demo.dto.*
 import com.giperbaba.demo.entity.Task
 import com.giperbaba.demo.mapper.TaskMapper
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
@@ -19,7 +20,9 @@ class TaskService(private val repository: TaskRepository): ITaskService {
     }
 
     override fun deleteTask(id: Long) {
-        repository.deleteById(id)
+        val task = repository.findById(id)
+            .orElseThrow { EntityNotFoundException("Task with id $id not found") }
+        repository.delete(task)
     }
 
     override fun updateTaskName(id: Long, request: UpdateTaskNameRequest) {

@@ -13,7 +13,7 @@ object TaskMapper {
     private val deadlineRegex = Regex("!before\\s+(\\d{2}[.]\\d{2}[.]\\d{4}|\\d{2}-\\d{2}-\\d{4})")
     private val priorityRegex = Regex("!([1-4])")
     private val supportedDateFormats = listOf(
-        DateTimeFormatter.ISO_LOCAL_DATE,
+        //DateTimeFormatter.ISO_LOCAL_DATE,
         DateTimeFormatter.ofPattern("dd.MM.yyyy"),
         DateTimeFormatter.ofPattern("dd-MM-yyyy")
     )

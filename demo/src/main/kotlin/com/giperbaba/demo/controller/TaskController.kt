@@ -2,24 +2,30 @@ package com.giperbaba.demo.controller
 
 import com.giperbaba.demo.dto.*
 import com.giperbaba.demo.service.ITaskService
+import jakarta.persistence.EntityNotFoundException
+import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("api/todo_list")
 @CrossOrigin(origins = ["*"])
-class UserController(private val service: ITaskService) {
+class TaskController(private val service: ITaskService) {
 
     @PostMapping("create")
-    fun createTask(@RequestBody taskDto: TaskCreateDto): ResponseEntity<TaskDetailsDto> {
+    fun createTask(@Valid @RequestBody taskDto: TaskCreateDto): ResponseEntity<TaskDetailsDto> {
         val task = service.create(taskDto)
         return ResponseEntity.ok(task);
     }
 
     @DeleteMapping("delete/{id}")
-    fun deleteTask(@PathVariable id: Long): ResponseEntity<String> {
-        service.deleteTask(id)
-        return ResponseEntity.ok().build()
+    fun deleteTask(@PathVariable id: Long): ResponseEntity<Void> {
+        return try {
+            service.deleteTask(id)
+            ResponseEntity.ok().build()
+        } catch (e: EntityNotFoundException) {
+            ResponseEntity.notFound().build()
+        }
     }
 
     @PutMapping("update/name/{id}")

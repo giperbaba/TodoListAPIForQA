@@ -9,4 +9,5 @@ import java.util.*
 @Repository
 interface TaskRepository : JpaRepository<Task, Long>, JpaSpecificationExecutor<Task> {
     override fun findById(id: Long): Optional<Task>
+    override fun deleteAll() {}
 }
